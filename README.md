@@ -1,6 +1,6 @@
 # PDI EXT3 Air Quality
 
-The **PDI_EXT3_AirQuality** project runs on the Silicon Labs EFR32xG24 Explorer Kit, acquires PM, RH/T, VOC, NOx and CO2 measurements from the Sensirion SN66 sensing platform, and displays them on the Pervasive Displays "Spectra 4" 2.66" four colours screen.
+The **PDI_EXT3_Air_Quality** project runs on the Silicon Labs EFR32xG24 Explorer Kit, acquires PM, RH/T, VOC, NOx and CO2 measurements from the Sensirion SN66 sensing platform, and displays them on the Pervasive Displays "Spectra 4" 2.66" four colours screen.
 
 The project is developed with the Arduino IDE, the Silicon Labs core for Arduino and the Basic edition of the Pervasive Displays Library Suite.
 
@@ -44,7 +44,7 @@ Algorithms
 * Wind Chill and Humidex https://ptaff.ca/humidex/?lang=en_CA
 * Humidex scores https://www.researchgate.net/figure/HUMIDEX-scores-by-air-temperature-o-C-and-relative-humidity-source_fig1_29462712
 * Air quality https://www.researchgate.net/figure/Air-Quality-Thresholds-for-PM25-PM10-and-CO2_fig2_342820337
-* Thresholds answered by ChatGPT [Air Quality Thresholds](./AirQualityThresholds.md)  
+* Thresholds answered by ChatGPT [Air Quality Thresholds](./Air_Quality_Thresholds.md)  
 
 ## Issues
 

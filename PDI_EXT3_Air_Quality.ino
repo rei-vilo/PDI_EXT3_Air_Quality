@@ -1,5 +1,5 @@
 ///
-/// @file PDI_EXT3_AirQuality.ino
+/// @file PDI_EXT3_Air_Quality.ino
 /// @brief Example of air quality monitoring with e-paper display
 ///
 /// @details Based on Sensirion mySN66 example
@@ -377,6 +377,13 @@ void setup()
     hV_HAL_log(LEVEL_INFO, "%s %s", __DATE__, __TIME__);
     hV_HAL_Serial_crlf();
 
+    hV_HAL_GPIO_define(LED_BUILTIN, OUTPUT);
+    for (uint8_t i = 0; i < 6; i+=1)
+    {
+        hV_HAL_GPIO_write(LED_BUILTIN, (i % 2 ? LED_BUILTIN_INACTIVE : LED_BUILTIN_ACTIVE));
+        hV_HAL_delayMilliseconds(333);
+    }
+
     // Start
     myScreen.begin();
     myScreen.setOrientation(ORIENTATION_LANDSCAPE);
@@ -462,7 +469,10 @@ void loop()
         hV_HAL_log(LEVEL_INFO, "minutes = %i", minutes);
 
         // SN66
+        hV_HAL_GPIO_write(LED_BUILTIN, LED_BUILTIN_ACTIVE);
         result = readSensor();
+        hV_HAL_GPIO_write(LED_BUILTIN, LED_BUILTIN_INACTIVE);
+
         calculateLevelTrend(pm1p0, 36.0, 76.0, 151.0, 251.0);
         calculateLevelTrend(pm2p5, 13.0, 36.0, 56.0, 151.0);
         calculateLevelTrend(pm4p0, 26.0, 51.0, 101.0, 151.0);
