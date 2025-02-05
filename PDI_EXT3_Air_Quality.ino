@@ -102,8 +102,8 @@ bool flagDisplay = true;
 uint8_t result;
 
 // Levels
-const uint16_t frontColours[5] = { myColours.black, myColours.red, myColours.black, myColours.white, myColours.white };
-const uint16_t backColours[5] = { myColours.white, myColours.white, myColours.yellow, myColours.red, myColours.black };
+const uint16_t frontColours[6] = { myColours.black, myColours.red, myColours.black, myColours.white, myColours.white };
+const uint16_t backColours[6] = { myColours.white, myColours.white, myColours.yellow, myColours.red, myColours.black };
 const char * stringLevel[] = {"Good", "Moderate", "Unhealthy for sensitive groups", "Unhealthy", "Very Unhealthy or Hazardous"};
 const char * stringTrend[] = {"-", "=", "+"};
 
@@ -272,6 +272,8 @@ void displaySection(uint8_t column, uint8_t row, measure_s measure)
     {
         return;
     }
+
+    // measure.level = (column + row) % 6; // For tests
 
     uint16_t frontColour = frontColours[measure.level];
     uint16_t backColour = backColours[measure.level];

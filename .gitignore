@@ -1,0 +1,4 @@
+.builds/
+docs/
+lib*.a
+mbed-os/
