@@ -18,7 +18,7 @@ Particulate matter 4.0 | `pm4p0` | &micro;g/m&sup3; | 0...1000
 Particulate matter 10.0 | `pm10p0` | &micro;g/m&sup3; | 0...1000
 Temperature | `temperature` | °C | 10...40
 Relative humidity | `humidity` | % | 20...80
-Humidex | `humidex` | °C | 10...80
+Humidex | `humidex` | % | 10...80
 VOC index | `voc` | index | 0...500
 NO<sub>X</sub> index | `nox` | index | 0...500
 CO<sub>2</sub>  | `co2` | ppm | 0...40000
@@ -45,6 +45,7 @@ Algorithms
 
 * Wind Chill and Humidex https://ptaff.ca/humidex/?lang=en_CA
 * Humidex scores https://www.researchgate.net/figure/HUMIDEX-scores-by-air-temperature-o-C-and-relative-humidity-source_fig1_29462712
+* Humidex thresholds https://www.canada.ca/en/environment-climate-change/services/seasonal-weather-hazards/warm-season-weather-hazards.html#toc7
 * Air quality https://www.researchgate.net/figure/Air-Quality-Thresholds-for-PM25-PM10-and-CO2_fig2_342820337
 * Thresholds answered by ChatGPT [Air Quality Thresholds](./Air_Quality_Thresholds.md)  
 

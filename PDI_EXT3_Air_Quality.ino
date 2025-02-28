@@ -25,7 +25,7 @@
 // Release 901: Initial version
 // Release 902: Added about page
 // Release 903: Added CO2, VOC, NOx
-// Release 904: Updated humidex unit and threesholds
+// Release 904: Updated humidex unit and thresholds
 // Release 904: Updated SEN66 library to release 1.1.0
 
 // SDK and configuration
