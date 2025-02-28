@@ -2,6 +2,8 @@
 
 The **PDI_EXT3_Air_Quality** project runs on the Silicon Labs EFR32xG24 Explorer Kit, acquires PM, RH/T, VOC, NOx and CO2 measurements from the Sensirion SN66 sensing platform, and displays them on the Pervasive Displays "Spectra 4" 2.66" four colours screen.
 
+![](img/Image-800.jpeg)
+
 The project is developed with the Arduino IDE, the Silicon Labs core for Arduino and the Basic edition of the Pervasive Displays Library Suite.
 
 ## Details
