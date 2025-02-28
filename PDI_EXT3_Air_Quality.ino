@@ -8,8 +8,8 @@
 /// - xG24 Explorer Kit
 ///
 /// @author Rei Vilo
-/// @date 21 Feb 2025
-/// @version 903
+/// @date 28 Feb 2025
+/// @version 904
 ///
 /// @copyright (c) Rei Vilo, 2010-2025
 /// @copyright Creative Commons Attribution-ShareAlike 4.0 International (CC BY-SA 4.0)
@@ -21,6 +21,12 @@
 /// * Sensirion SN66 Sensing platform for PM, RH/T, VOC, Nox and CO2 measurements https://sensirion.com/products/catalog/SEN66
 /// * PDLS_Basic Library for Pervasive Displays iTC screens, extension boards and development kits https://github.com/rei-vilo/PDLS_Basic
 ///
+
+// Release 901: Initial version
+// Release 902: Added about page
+// Release 903: Added CO2, VOC, NOx
+// Release 904: Updated humidex unit and threesholds
+// Release 904: Updated SEN66 library to release 1.1.0
 
 // SDK and configuration
 #include "PDLS_Common.h"
@@ -98,7 +104,6 @@ static uint32_t chrono32 = 0;
 static uint8_t countFlush = 1; // Counter for global update
 static uint8_t minutes = 0;
 const uint8_t FAST_BEFORE_NORMAL = 8; // Number of fast updates before normal update
-bool flagDisplay = true;
 uint8_t result;
 
 // Levels
@@ -115,10 +120,9 @@ const char * stringTrend[] = {"-", "=", "+"};
 ///
 /// @brief Configure mySN66 SN66
 ///
-/// @return false RESULT_SUCCESS
-/// @return true RESULT_ERROR
+/// @return RESULT_SUCCESS, RESULT_ERROR
 ///
-bool configureSensor()
+uint8_t configureSensor()
 {
     static char errorMessage[64];
     static int16_t error;
@@ -136,7 +140,8 @@ bool configureSensor()
     delay(1200);
 
     uint8_t serialNumber[32] = {0};
-    error = mySN66.getSerialNumber(serialNumber, 32);
+    // getSerialNumber() now requires int8_t instead of uint8_t
+    error = mySN66.getSerialNumber((int8_t*)serialNumber, 32);
     if (error != NO_ERROR)
     {
         errorToString(error, errorMessage, sizeof errorMessage);
@@ -159,10 +164,9 @@ bool configureSensor()
 ///
 /// @brief Read values from SN66
 ///
-/// @return false RESULT_SUCCESS
-/// @return true RESULT_ERROR
+/// @return RESULT_SUCCESS, RESULT_ERROR, RESULT_NOT_READY
 ///
-bool readSensor()
+uint8_t readSensor()
 {
     static char errorMessage[64];
     static int16_t error;
@@ -189,6 +193,11 @@ bool readSensor()
     // From https://ptaff.ca/humidex/?lang=en_CA
     float e = humidity.value / 100.0 * 6.112 * exp((17.67 * temperature.value) / (temperature.value + 243.5));
     humidex.value = temperature.value + (5.0 / 9.0) * (e - 10.0);
+
+    if ((pm1p0.value == 0xffff / 10.0) or (pm2p5.value == 0xffff / 10.0) or (pm4p0.value == 0xffff / 10.0) or (pm10p0.value == 0xffff / 10.0) or (co2.value == 0xffff * 1.0))
+    {
+        return RESULT_ERROR;
+    }
 
     return RESULT_SUCCESS;
 }
@@ -306,10 +315,34 @@ void displaySection(uint8_t column, uint8_t row, measure_s measure)
     myScreen.gText(tx, ty, formatString("%5.1f", measure.value), frontColour, backColour);
 
     // Trend
-    myScreen.selectFont(fontMedium);
-    tx = dx * column;
-    ty = dy * row + myScreen.characterSizeY();
-    myScreen.gText(tx + 2, ty + 2, stringTrend[measure.trend + 1], frontColour, backColour);
+    myScreen.selectFont(fontMedium); // 8x12
+    tx = dx * column + 2;
+    ty = dy * row + myScreen.characterSizeY() + 2;
+    // myScreen.gText(tx, ty, stringTrend[measure.trend + 1], frontColour, backColour);
+
+    switch (measure.trend)
+    {
+        case -1:
+
+            myScreen.line(tx + 4, ty + 8, tx + 8, ty + 8, frontColour);
+            myScreen.line(tx + 8, ty + 4, tx + 8, ty + 8, frontColour);
+            myScreen.line(tx, ty, tx + 5, ty + 5, frontColour);
+            break;
+
+        case 0:
+
+            myScreen.line(tx + 4, ty, tx + 8, ty + 4, frontColour);
+            myScreen.line(tx + 4, ty + 8, tx + 8, ty + 4, frontColour);
+            myScreen.line(tx, ty + 4, tx + 4, ty + 4, frontColour);
+            break;
+
+        case 1:
+
+            myScreen.line(tx + 4, ty, tx + 8, ty, frontColour);
+            myScreen.line(tx + 8, ty, tx + 8, ty + 4, frontColour);
+            myScreen.line(tx, ty + 8, tx + 5, ty + 3, frontColour);
+            break;
+    }
 
     // Frame
     // tx = dx * column;
@@ -380,7 +413,7 @@ void setup()
     hV_HAL_Serial_crlf();
 
     hV_HAL_GPIO_define(LED_BUILTIN, OUTPUT);
-    for (uint8_t i = 0; i < 6; i+=1)
+    for (uint8_t i = 0; i < 6; i += 1)
     {
         hV_HAL_GPIO_write(LED_BUILTIN, (i % 2 ? LED_BUILTIN_INACTIVE : LED_BUILTIN_ACTIVE));
         hV_HAL_delayMilliseconds(333);
@@ -431,8 +464,8 @@ void setup()
     humidity.unitISO = utf2iso(humidity.unitUTF);
 
     humidex.name = "Humidex";
-    humidex.unitUTF = "oC";
-    humidex.unitISO = utf2iso("°C");
+    humidex.unitUTF = "%";
+    humidex.unitISO = utf2iso("%");
 
     voc.name = "VOC";
     voc.unitUTF = "index";
@@ -482,7 +515,8 @@ void loop()
 
         calculateLevelTrend(temperature, 20, 30, 40, 50);
         calculateLevelTrend(humidity, 40, 50, 60, 70);
-        calculateLevelTrend(humidex, 30, 40, 46, 55);
+        // https://www.canada.ca/en/environment-climate-change/services/seasonal-weather-hazards/warm-season-weather-hazards.html#toc7
+        calculateLevelTrend(humidex, 20, 30, 40, 45);
 
         calculateLevelTrend(voc, 100, 200, 300, 400);
         calculateLevelTrend(nox, 100, 200, 300, 400);
@@ -541,5 +575,6 @@ void loop()
     }
 
     hV_HAL_delayMilliseconds(100);
+    // LowPower.deepSleep(100); // Deep sleep for 100 ms, but RAM lost
 }
 
